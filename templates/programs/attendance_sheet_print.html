@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block title %}كشف الحضور والانصراف{% endblock %}
+{% block content %}
+<style>
+@media print {
+    body, table, th, td, div, span, p, h1, h2, h3, h4, h5, h6 {
+        font-size: 14px !important;
+        font-weight: bold !important;
+    }
+    @page {
+        size: A4 landscape;
+        margin: 0;
+    }
+    html, body {
+        width: 240mm !important;
+        height: 210mm !important;
+        min-width: 240mm !important;
+        min-height: 210mm !important;
+        max-width: 297mm !important;
+        max-height: 210mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        box-sizing: border-box;
+        overflow: visible !important;
+    }
+    body * { visibility: hidden !important; }
+    .attendance-sheet, .attendance-sheet * { visibility: visible !important; }
+    .attendance-sheet {
+        width: 280mm !important;
+        height: 210mm !important;
+        min-width: 280mm !important;
+        min-height: 210mm !important;
+        max-width: 297mm !important;
+        max-height: 210mm !important;
+        margin: 0 auto 0 0 !important;
+        margin-right:0 !important;
+        margin-left: 1.7cm !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        box-sizing: border-box;
+        background: #fff !important;
+        page-break-after: always;
+        position: static !important;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        direction: rtl !important;
+    }
+    .attendance-table, .attendance-footer-table { width: 100% !important; }
+    .attendance-table {
+        direction: rtl !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+    }
+    .attendance-table tr, .attendance-table td, .attendance-table th {
+        height: 0.6cm !important;
+        min-height: 0.6cm !important;
+        max-height: 0.6cm !important;
+        font-size: 0.7em !important;
+        padding: 0 !important;
+        line-height: 1 !important;
+    }
+    .attendance-header-right, .attendance-title-center, .attendance-footer-table, .attendance-footer-table td, .attendance-footer-flex, .attendance-footer-center {
+        font-size: 0.75em !important;
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+    .attendance-footer-table td { font-size: 0.75em !important; }
+    /* إخفاء أي عناصر غير الكشف */
+    .no-print, .navbar, .sidebar, .other-elements {
+        display: none !important;
+    }
+}
+.attendance-sheet {
+    background: #fff;
+    width: 29.7cm;
+    height: 20.7cm;
+    min-height: 20.7cm;
+    max-height: 20.7cm;
+    margin: 0;
+    box-sizing: border-box;
+    border: 1.5px solid #000;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+.attendance-header-right {
+    text-align: right;
+    font-weight: bold;
+    font-size: 1.02rem;
+    line-height: 1.5;
+    margin-bottom: 0.2rem;
+    margin-right: 0.5rem;
+}
+.attendance-title-center {
+    text-align: center;
+    font-size: 1.08rem;
+    font-weight: bold;
+    margin-bottom: 1.2rem;
+    margin-top: 0.2rem;
+    line-height: 1.7;
+}
+.attendance-table th, .attendance-table td {
+    border: 1px solid #222;
+    text-align: center;
+}
+.attendance-table th {
+    background: #f3f6fa;
+    font-size: 0.85em;
+}
+.attendance-table th[rowspan="2"] { min-width: 30px; }
+.attendance-table th[colspan="2"] { min-width: 45px; }
+.attendance-table td { font-size: 0.8em; }
+.attendance-table td:nth-child(2) { min-width: 120px; }
+.attendance-table td, .attendance-table th { padding: 0 !important; }
+.attendance-footer-table {
+    width: 100%;
+    margin-top: 0.7cm;
+    font-size: 0.8em;
+    border: none;
+}
+.attendance-footer-table td {
+    border: none;
+    text-align: center;
+    font-weight: bold;
+    padding-top: 0.2rem;
+}
+.attendance-footer-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    width: 100%;
+    gap: 1rem;
+}
+.attendance-footer-center {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    font-weight: bold;
+}
+.attendance-footer-sign {
+    font-weight: normal;
+    padding-top: 0.2rem;
+    min-width: 80px;
+    text-align: center;
+}
+</style>
+<div class="no-print mb-3 text-center">
+    <button onclick="window.print()" class="btn btn-primary">طباعة</button>
+    <a href="javascript:window.close()" class="btn btn-secondary">إغلاق</a>
+</div>
+{% for teachers, empty_rows in pages %}
+<div class="attendance-sheet">
+    <div class="attendance-header-right">
+        الأزهر الشريف<br>
+        منطقة البحيرة الأزهرية<br>
+        الإدارة العامة للتدريب وتنمية المهارات
+    </div>
+    <div class="attendance-title-center">
+        حضور وانصراف المتدربين لبرنامج (<span style="font-weight:normal">{{ program.name }}</span>) للفئة (<span style="font-weight:normal">{{ program.target_group }}</span>) المقام في الفترة من (<span style="font-weight:normal">{{ program.start_date }}</span>) إلى (<span style="font-weight:normal">{{ program.end_date }}</span>) المقام في (<span style="font-weight:normal">{{ program.location|default:'-' }}</span>)
+    </div>
+    <table class="attendance-table">
+        <thead>
+            <tr>
+                <th rowspan="2" style="min-width: 30px;">م</th>
+                <th rowspan="2" style="min-width: 100px;">الاسم الرباعي</th>
+                {% for day in days %}
+                    <th colspan="2" style="min-width: 60px;">{{ day }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for day in days %}
+                    <th style="min-width: 30px; font-size:0.97em;">حضور</th>
+                    <th style="min-width: 30px; font-size:0.97em;">انصراف</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for teacher in teachers %}
+            <tr>
+                <td>{{ forloop.counter0|add:1 }}</td>
+                <td>{{ teacher.name }}</td>
+                {% for day in days %}
+                    <td></td>
+                    <td></td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            {% for i in empty_rows %}
+            <tr>
+                <td></td>
+                <td></td>
+                {% for day in days %}
+                    <td></td>
+                    <td></td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div style="width:100%; margin-top:1.5rem; display: flex; flex-direction: column; align-items: center;">
+        <div style=" text-align:right; width:100%; display:flex; justify-content:right;padding-right: 90px;">  المشرف التنفيذى  </div>
+        <table class="attendance-footer-table" style="width:100%; margin-top:1.5rem;">
+            <tr>
+                <td style="text-align: right; font-weight: bold; min-width: 90px;">الاسم</td>
+                <td style="text-align: right; font-weight: bold; min-width: 90px;padding-right: 100px;">التوقيع</td>
+                <td style="text-align: center; font-weight: bold; min-width: 140px;">مدير إدارة التدريب</td>
+                <td style="text-align: left; font-weight: bold; min-width: 90px;padding-left: 100px;">يعتمد</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td style="text-align: center; font-weight: bold;">د . محمد فتحى قنطوش</td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+{% block extra_js %}
+<script>
+// دعم forloop في ملء الصفوف الفارغة
+window.addEventListener('DOMContentLoaded', function() {
+    if (!window.to) {
+        window.to = function(n) { return Array.from({length: n}, (_, i) => i); };
+    }
+});
+</script>
+{% endblock %} 

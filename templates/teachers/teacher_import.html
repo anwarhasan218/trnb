@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}استيراد بيانات المعلمين من Excel{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card p-4 shadow-sm">
+        <h3 class="mb-3">استيراد بيانات المعلمين من Excel</h3>
+        <div class="alert alert-info">
+            <ul class="mb-1">
+                <li>يرجى تنزيل <a href="{% url 'download_teacher_template' %}">نموذج Excel الفارغ</a> وتعبئته بالبيانات المطلوبة.</li>
+                <li>يجب عدم تغيير ترتيب أو أسماء الأعمدة في النموذج.</li>
+                <li>يُسمح برفع ملفات بصيغة <b>.xlsx</b> فقط.</li>
+                <li>سيتم تجاهل أي صف يحتوي على بيانات ناقصة في الحقول الأساسية (الاسم، الرقم القومي، رقم السجل).</li>
+            </ul>
+        </div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">اختر ملف Excel:</label>
+                <input type="file" name="excel_file" accept=".xlsx" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">استيراد</button>
+            <a href="{% url 'teacher_list' %}" class="btn btn-secondary">إلغاء</a>
+        </form>
+        {% if message %}
+            <div class="alert alert-{{ message_type }} mt-3">{{ message }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

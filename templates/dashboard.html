@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}لوحة التحكم{% endblock %}
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #f8f9fa 60%, #e3eafc 100%);
+    }
+    .dashboard-welcome {
+        background: linear-gradient(90deg, #0d6efd 60%, #0a58ca 100%);
+        color: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 16px #0d6efd22;
+        padding: 1.2rem 2rem 1rem 2rem;
+        margin-bottom: 2.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        animation: fadeInDown 1s;
+    }
+    .dashboard-welcome .icon {
+        font-size: 2.5rem;
+        background: #fff2;
+        border-radius: 50%;
+        padding: 0.7rem 1.1rem;
+        box-shadow: 0 2px 8px #0001;
+    }
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .stat-card {
+        border: none;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 16px #0d6efd11;
+        transition: transform 0.18s, box-shadow 0.18s;
+        min-height: 190px;
+        background: linear-gradient(135deg, #fff 80%, #e3eafc 100%);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 1s;
+    }
+    .stat-card:hover {
+        transform: translateY(-7px) scale(1.035);
+        box-shadow: 0 8px 32px #0d6efd22;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .stat-icon {
+        font-size: 2.7rem;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+        background: #f8f9fa;
+        border-radius: 50%;
+        padding: 0.7rem 1.1rem;
+        box-shadow: 0 2px 8px #0001;
+    }
+    .stat-title {
+        font-size: 1.1rem;
+        color: #888;
+        margin-bottom: 0.2rem;
+    }
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    .main-actions .btn {
+        font-size: 1.18rem;
+        border-radius: 2rem;
+        padding: 0.8rem 2.7rem;
+        margin: 0 0.7rem;
+        box-shadow: 0 2px 8px #0d6efd11;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+    .main-actions .btn:hover {
+        box-shadow: 0 4px 16px #0d6efd22;
+    }
+    .details-list li {
+        font-size: 1.08rem;
+        color: #0a58ca;
+        margin-bottom: 0.2rem;
+    }
+</style>
+<div class="dashboard-welcome mb-4">
+    <span class="icon">🏆</span>
+    <div>
+        <h2 class="mb-1" style="font-weight:700; letter-spacing:0.5px;">مرحباً بك في لوحة التحكم</h2>
+        <div class="text-light" style="font-size:1.1rem;">يمكنك إدارة بيانات المعلمين، البرامج التدريبية، التقارير، والاستيراد من Excel بسهولة.</div>
+    </div>
+</div>
+<div class="row justify-content-center mb-4 g-4">
+    <div class="col-lg-3 col-md-4 col-6">
+        <div class="card stat-card text-center p-4 bg-primary bg-opacity-10">
+            <span class="stat-icon text-primary">
+                <svg width="36" height="36" fill="currentColor" viewBox="0 0 24 24"><path d="M19 21V9.24l-7-5.6-7 5.6V21h14zm-7-8a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg>
+            </span>
+            <div class="stat-title">عدد البرامج التدريبية</div>
+            <div class="stat-value text-primary">{{ total_programs }}</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-4 col-6">
+        <div class="card stat-card text-center p-4 bg-success bg-opacity-10">
+            <span class="stat-icon text-success">
+                <svg width="36" height="36" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </span>
+            <div class="stat-title">عدد المتدربين</div>
+            <div class="stat-value text-success">{{ total_trainees }}</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-4 col-6">
+        <div class="card stat-card text-center p-4 bg-warning bg-opacity-10">
+            <span class="stat-icon text-warning">
+                <svg width="36" height="36" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </span>
+            <div class="stat-title">إجمالي عدد المعلمين</div>
+            <div class="stat-value text-warning">{{ total_teachers }}</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-4 col-12">
+        <div class="card stat-card text-center p-4 bg-info bg-opacity-10">
+            <span class="stat-icon text-info">
+                <svg width="36" height="36" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+            </span>
+            <div class="stat-title">عدد البرامج لكل مرحلة</div>
+            <ul class="list-unstyled mb-0 details-list">
+                {% for item in programs_per_stage %}
+                    <li>{{ item.stage|default:'غير محدد' }}: <b>{{ item.count }}</b></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row main-actions justify-content-center mt-4 mb-2">
+    <div class="col-auto">
+        <a href="/teachers/" class="btn btn-outline-primary">إدارة المعلمين</a>
+    </div>
+    <div class="col-auto">
+        <a href="/programs/" class="btn btn-outline-success">البرامج التدريبية</a>
+    </div>
+    <div class="col-auto">
+        <a href="#" class="btn btn-outline-info disabled">التقارير والإحصائيات</a>
+    </div>
+</div>
+{% endblock %} 

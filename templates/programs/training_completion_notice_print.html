@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}إخطار إنهاء برنامج تدريبي{% endblock %}
+{% block content %}
+<style>
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+    html, body {
+        width: 210mm !important;
+        height: 297mm !important;
+        min-width: 210mm !important;
+        min-height: 297mm !important;
+        max-width: 210mm !important;
+        max-height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        box-sizing: border-box;
+        overflow: visible !important;
+    }
+    body, table, th, td, div, span, p, h1, h2, h3, h4, h5, h6 {
+        font-size: 14px !important;
+        font-weight: bold !important;
+    }
+    body * { visibility: hidden !important; }
+    .notice-page, .notice-page * { visibility: visible !important; }
+    .notice-page {
+        width: 190mm !important;
+        min-width: 190mm !important;
+        max-width: 190mm !important;
+        height: 277mm !important;
+        min-height: 277mm !important;
+        max-height: 277mm !important;
+        margin: 0 auto !important;
+        margin-top: 10mm !important;
+        margin-bottom: 10mm !important;
+        padding: 0 !important;
+        background: #fff !important;
+        box-sizing: border-box;
+        page-break-after: always;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        direction: rtl !important;
+    }
+}
+.notice-page {
+    width: 19cm;
+    min-width: 19cm;
+    max-width: 19cm;
+    height: 27.7cm;
+    min-height: 27.7cm;
+    max-height: 27.7cm;
+    margin: 0 auto;
+    box-sizing: border-box;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1.2cm;
+}
+.notice-sheet {
+    width: 100%;
+    border: 2.5px solid #000;
+    padding: 1.2cm 1.5cm 1.2cm 1.5cm;
+    margin: 0 auto;
+    margin-bottom: 0.2cm;
+    font-family: 'Arial', 'Tahoma', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 11cm;
+    max-height: 12cm;
+    box-sizing: border-box;
+}
+.notice-header {
+    text-align: right;
+    font-weight: bold;
+    font-size: 1.25rem;
+    line-height: 1.7;
+    margin-bottom: 0.2rem;
+    margin-top: 0.2rem;
+}
+.notice-title {
+    text-align: center;
+    font-size: 1.18rem;
+    font-weight: bold;
+    margin: 1.2rem 0 1.7rem 0;
+    text-decoration: underline;
+    letter-spacing: 0.03em;
+}
+.notice-body {
+    font-size: 1.08rem;
+    line-height: 2.5;
+    margin-bottom: 1.2rem;
+    text-align: right;
+    padding-right: 2.5rem;
+    word-spacing: 0.2em;
+}
+.notice-footer {
+    width: 100%;
+    margin-top: 1.5rem;
+    font-size: 1.08rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+.notice-footer .left {
+    text-align: left;
+    flex: 1;
+    font-weight: bold;
+}
+.notice-footer .right {
+    text-align: right;
+    flex: 1;
+    font-weight: bold;
+}
+.notice-sign {
+    text-align: left;
+    margin-top: 1.2rem;
+    font-size: 1.08rem;
+    font-weight: bold;
+    padding-left: 2.5cm;
+}
+</style>
+<div class="no-print mb-3 text-center">
+    <button onclick="window.print()" class="btn btn-primary">طباعة جميع الإفادات</button>
+    <a href="javascript:window.close()" class="btn btn-secondary">إغلاق</a>
+</div>
+{% for trainees_pair in trainees|slice:0::2 %}
+<div class="notice-page">
+    {% for idx in "01" %}
+        {% with t=trainees|slice:forloop.parentloop.counter0|add:idx|first %}
+        {% if t %}
+        <div class="notice-sheet">
+            <div class="notice-header">
+                الأزهر الشريف<br>
+                منطقة البحيرة الأزهرية<br>
+                ادارة التدريب وتنمية المهارات
+            </div>
+            <div class="notice-title">
+                إخطار إنهاء برنامج تدريبي
+            </div>
+            <div class="notice-body">
+                تفيد إدارة التدريب بمنطقة البحيرة الأزهرية<br>
+                بأن السيد/ <span style="font-weight:bold; text-decoration:underline;">{{ t.name }}</span> سجل (<span style="font-weight:bold; text-decoration:underline;">{{ t.record_number }}</span>)<br>
+                بمعهد/ <span style="font-weight:bold; text-decoration:underline;">{{ t.institute }}</span><br>
+                قد اجتاز البرنامج التدريبي لمعلمي (<span style="font-weight:bold; text-decoration:underline;">{{ program.target_group }}</span>) (<span style="font-weight:bold; text-decoration:underline;">{{ program.name }}</span>)<br>
+                والمقام : (<span style="font-weight:bold; text-decoration:underline;">{{ program.location|default:'-' }}</span>)<br>
+                خلال الفترة من (<span style="font-weight:bold; text-decoration:underline;">{{ program.start_date }}</span>) إلى (<span style="font-weight:bold; text-decoration:underline;">{{ program.end_date }}</span>)<br>
+                وقد تغيب عن التدريب ايام : ....................................................<br>
+                وتنبه عليه العودة على مقر عمله صباح اليوم التالي للتدريب.<br>
+                وهذه إفادة منا بذلك ,,,,
+            </div>
+            <div class="notice-footer">
+                <div class="right">المختص</div>
+                <div class="left">يعتمد مدير إدارة التدريب</div>
+            </div>
+            <div class="notice-sign">
+                د محمد فتحي قنطوش
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+    {% endfor %}
+</div>
+{% endfor %}
+{% endblock %} 

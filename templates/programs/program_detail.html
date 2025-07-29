@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}تفاصيل البرنامج التدريبي{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <h2 class="mb-4">تفاصيل البرنامج التدريبي</h2>
+    <div class="card mb-4 p-3">
+        <h4>{{ program.name }}</h4>
+        <p><b>الفئة المستهدفة:</b> {{ program.target_group }}</p>
+        <p><b>المرحلة التعليمية:</b> {{ program.stage }}</p>
+        <p><b>تاريخ البداية:</b> {{ program.start_date }}</p>
+        <p><b>تاريخ النهاية:</b> {{ program.end_date }}</p>
+        <p><b>مكان إقامة البرنامج:</b> {{ program.location }}</p>
+    </div>
+    <div class="mb-3">
+        <a href="{% url 'program_list' %}" class="btn btn-secondary">العودة لقائمة البرامج</a>
+        <a href="{% url 'program_edit' program.pk %}" class="btn btn-warning">تعديل البرنامج</a>
+    </div>
+    <div class="card p-3 mb-4">
+        <h5 class="mb-3">نماذج وتقارير التدريب</h5>
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="{% url 'attendance_sheet_print' program.pk %}" class="btn btn-outline-primary" target="_blank">كشف الحضور والانصراف (طباعة)</a>
+            <a href="{% url 'introduction_sheet_print' program.pk %}" class="btn btn-outline-primary" target="_blank">كشف التعارف (طباعة)</a>
+            <a href="{% url 'pretest_sheet_print' program.pk %}" class="btn btn-outline-primary" target="_blank">كشف درجات الاختبار القبلي (طباعة)</a>
+            <a href="{% url 'posttest_sheet_print' program.pk %}" class="btn btn-outline-primary" target="_blank">كشف درجات الاختبار البعدي (طباعة)</a>
+            <a href="{% url 'behavior_sheet_print' program.pk %}" class="btn btn-outline-primary" target="_blank">كشف درجات السلوك والمواظبة (طباعة)</a>
+            <a href="{% url 'call_sheet_print' program.pk %}" class="btn btn-outline-primary" target="_blank">كشف المناداة (طباعة)</a>
+            <a href="{% url 'training_completion_notice_pdf' program.pk %}" class="btn btn-outline-primary" target="_blank">إخطار إنهاء التدريب (طباعة)</a>
+        </div>
+    </div>
+    <div class="card p-3 mb-4">
+        <h5 class="mb-3">إضافة معلم للبرنامج</h5>
+        <form method="get" class="row g-2 mb-2">
+            <div class="col-md-8">
+                <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="بحث بالاسم أو الرقم القومي أو السجل...">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary">بحث</button>
+            </div>
+        </form>
+        {% if search_results %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped text-center align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>اسم المعلم</th>
+                            <th>الرقم القومي</th>
+                            <th>رقم السجل</th>
+                            <th>إضافة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for teacher in search_results %}
+                        <tr>
+                            <td>{{ teacher.name }}</td>
+                            <td>{{ teacher.national_id }}</td>
+                            <td>{{ teacher.record_number }}</td>
+                            <td>
+                                <form method="post" action="{% url 'enroll_teacher' program.pk %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="teacher_id" value="{{ teacher.pk }}">
+                                    <button type="submit" class="btn btn-success btn-sm">إضافة</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% elif search_query %}
+            <div class="alert alert-warning">لا يوجد معلم مطابق لبحثك.</div>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <h5 class="mb-3">المعلمون المنتسبون للبرنامج <span class="badge bg-primary">{{ enrollments_count }}</span></h5>
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>اسم المعلم</th>
+                    <th>الرقم القومي</th>
+                    <th>رقم السجل</th>
+                    <th>إزالة</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for enroll in enrollments %}
+                <tr>
+                    <td>{{ enroll.teacher.name }}</td>
+                    <td>{{ enroll.teacher.national_id }}</td>
+                    <td>{{ enroll.teacher.record_number }}</td>
+                    <td>
+                        <form method="post" action="{% url 'unenroll_teacher' program.pk enroll.teacher.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">إزالة</button>
+                        </form>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4">لا يوجد معلمين منتسبين لهذا البرنامج بعد.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

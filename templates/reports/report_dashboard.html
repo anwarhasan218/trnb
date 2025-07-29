@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}التقارير والإحصائيات{% endblock %}
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #f8f9fa 60%, #e3eafc 100%);
+    }
+    .report-header {
+        background: linear-gradient(90deg, #0d6efd 60%, #0a58ca 100%);
+        color: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 16px #0d6efd22;
+        padding: 1.2rem 2rem 1rem 2rem;
+        margin-bottom: 2.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        animation: fadeInDown 1s;
+        justify-content: center;
+    }
+    .report-header .icon {
+        font-size: 2.5rem;
+        background: #fff2;
+        border-radius: 50%;
+        padding: 0.7rem 1.1rem;
+        box-shadow: 0 2px 8px #0001;
+    }
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .stat-card {
+        border: none;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 16px #0d6efd11;
+        transition: transform 0.18s, box-shadow 0.18s;
+        min-height: 190px;
+        background: linear-gradient(135deg, #fff 80%, #e3eafc 100%);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 1s;
+    }
+    .stat-card:hover {
+        transform: translateY(-7px) scale(1.035);
+        box-shadow: 0 8px 32px #0d6efd22;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .stat-icon {
+        font-size: 2.7rem;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+        background: #f8f9fa;
+        border-radius: 50%;
+        padding: 0.7rem 1.1rem;
+        box-shadow: 0 2px 8px #0001;
+    }
+    .stat-title {
+        font-size: 1.1rem;
+        color: #888;
+        margin-bottom: 0.2rem;
+    }
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    .export-btn {
+        font-size: 1.1rem;
+        border-radius: 2rem;
+        padding: 0.7rem 2.5rem;
+        margin-bottom: 1.5rem;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px #0d6efd11;
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+    .export-btn:hover {
+        box-shadow: 0 4px 16px #0d6efd22;
+    }
+    .filter-form {
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 2px 8px #0001;
+        padding: 1.5rem 1rem 0.5rem 1rem;
+        margin-bottom: 2rem;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .filter-form .form-label {
+        font-weight: 500;
+        margin-bottom: 0.4rem;
+    }
+    .filter-form .form-select {
+        min-width: 160px;
+        text-align: right;
+    }
+    .filter-form .btn-primary {
+        font-size: 1.15rem;
+        padding: 0.6rem 2.5rem;
+        border-radius: 2rem;
+        font-weight: bold;
+    }
+    .report-title {
+        font-size: 2.3rem;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 0.3rem;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 8px #0001;
+        border-bottom: 2px solid #e3eafc44;
+        display: inline-block;
+        padding-bottom: 0.2rem;
+    }
+    .report-desc {
+        font-size: 1.08rem;
+        color: #e3eafc;
+        margin-bottom: 1.2rem;
+        margin-top: 0.1rem;
+    }
+    .details-list li {
+        font-size: 1.08rem;
+        color: #0a58ca;
+        margin-bottom: 0.2rem;
+    }
+    @media (min-width: 768px) {
+        .filter-form .row {
+            flex-wrap: nowrap;
+        }
+        .filter-form .col-md-4, .filter-form .col-md-2 {
+            flex: 1 1 0;
+            max-width: 33%;
+        }
+        .filter-form .col-md-2 {
+            max-width: 20%;
+        }
+    }
+</style>
+<div class="report-header mb-4">
+    <span class="icon">📊</span>
+    <div>
+        <span class="report-title">التقارير والإحصائيات</span>
+        <div class="report-desc">يمكنك هنا استعراض أهم الإحصائيات والتقارير، مع إمكانية التصفية والتصدير.</div>
+    </div>
+</div>
+<form method="get" class="row filter-form justify-content-center align-items-end g-3">
+    <div class="col-md-4 mb-2 mb-md-0">
+        <label class="form-label">تصفية حسب المرحلة التعليمية:</label>
+        <select name="stage" class="form-select">
+            <option value="">كل المراحل</option>
+            {% for s in all_stages %}
+                <option value="{{ s }}" {% if s == stage_filter %}selected{% endif %}>{{ s|default:'غير محدد' }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4 mb-2 mb-md-0">
+        <label class="form-label">تصفية حسب المادة:</label>
+        <select name="subject" class="form-select">
+            <option value="">كل المواد</option>
+            {% for sub in all_subjects %}
+                <option value="{{ sub }}" {% if sub == subject_filter %}selected{% endif %}>{{ sub|default:'غير محدد' }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-primary">تصفية</button>
+    </div>
+</form>
+<div class="text-center mb-3">
+    <a href="{% url 'export_report_excel' %}?stage={{ stage_filter }}&subject={{ subject_filter }}" class="btn btn-outline-success export-btn">تصدير Excel</a>
+    <a href="{% url 'export_report_pdf' %}?stage={{ stage_filter }}&subject={{ subject_filter }}" class="btn btn-outline-danger export-btn">تصدير PDF</a>
+</div>
+<div class="row justify-content-center mb-4 g-4">
+    <div class="col-lg-4 col-md-6 col-12">
+        <div class="card stat-card text-center p-4 bg-primary bg-opacity-10">
+            <span class="stat-icon text-primary">
+                <svg width="36" height="36" fill="currentColor" viewBox="0 0 24 24"><path d="M19 21V9.24l-7-5.6-7 5.6V21h14zm-7-8a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg>
+            </span>
+            <div class="stat-title">عدد البرامج التدريبية</div>
+            <div class="stat-value text-primary">{{ total_programs }}</div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 col-12">
+        <div class="card stat-card text-center p-4 bg-success bg-opacity-10">
+            <span class="stat-icon text-success">
+                <svg width="36" height="36" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </span>
+            <div class="stat-title">عدد المتدربين</div>
+            <div class="stat-value text-success">{{ total_trainees }}</div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 col-12">
+        <div class="card stat-card text-center p-4 bg-info bg-opacity-10">
+            <span class="stat-icon text-info">
+                <svg width="36" height="36" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+            </span>
+            <div class="stat-title">عدد البرامج لكل مرحلة</div>
+            <ul class="list-unstyled mb-0 details-list">
+                {% for item in programs_per_stage %}
+                    <li>{{ item.stage|default:'غير محدد' }}: <b>{{ item.count }}</b></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}كشف درجات الاختبار القبلي{% endblock %}
+{% block content %}
+<style>
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+    html, body {
+        width: 210mm !important;
+        height: 297mm !important;
+        min-width: 210mm !important;
+        min-height: 297mm !important;
+        max-width: 210mm !important;
+        max-height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        box-sizing: border-box;
+        overflow: visible !important;
+    }
+    body * { visibility: hidden !important; }
+    .pretest-sheet, .pretest-sheet * { visibility: visible !important; }
+    .pretest-sheet {
+        width: 190mm !important;
+        min-width: 190mm !important;
+        max-width: 190mm !important;
+        height: 277mm !important;
+        min-height: 277mm !important;
+        max-height: 277mm !important;
+        margin: 0 auto !important;
+        margin-top: 10mm !important;
+        margin-bottom: 10mm !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        box-sizing: border-box;
+        background: #fff !important;
+        page-break-after: avoid !important;
+        position: static !important;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        direction: rtl !important;
+    }
+    .pretest-table, .pretest-footer-table { width: 100% !important; }
+    .pretest-table {
+        direction: rtl !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+    }
+    .pretest-table tr, .pretest-table td, .pretest-table th {
+        height: 0.7cm !important;
+        min-height: 0.7cm !important;
+        max-height: 0.7cm !important;
+        font-size: 0.8em !important;
+        padding: 0 !important;
+        line-height: 1 !important;
+    }
+    .pretest-header-right, .pretest-title-center, .pretest-footer-table, .pretest-footer-table td {
+        font-size: 0.85em !important;
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+    .pretest-footer-table td { font-size: 0.85em !important; }
+    .no-print, .navbar, .sidebar, .other-elements {
+        display: none !important;
+    }
+}
+.pretest-sheet {
+    background: #fff;
+    width: 19cm;
+    min-width: 19cm;
+    max-width: 19cm;
+    height: 27.7cm;
+    min-height: 27.7cm;
+    max-height: 27.7cm;
+    margin: 0 auto;
+    box-sizing: border-box;
+    border: 1.5px solid #000;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+.pretest-header-right {
+    text-align: right;
+    font-weight: bold;
+    font-size: 1.02rem;
+    line-height: 1.5;
+    margin-bottom: 0.2rem;
+    margin-right: 0.5rem;
+}
+.pretest-title-center {
+    text-align: center;
+    font-size: 1.08rem;
+    font-weight: bold;
+    margin-bottom: 1.2rem;
+    margin-top: 0.2rem;
+    line-height: 1.7;
+}
+.pretest-table th, .pretest-table td {
+    border: 1px solid #222;
+    text-align: center;
+}
+.pretest-table th {
+    background: #f3f6fa;
+    font-size: 0.95em;
+}
+.pretest-table td, .pretest-table th { padding: 0 !important; }
+.pretest-footer-table {
+    width: 100%;
+    margin-top: 0.7cm;
+    font-size: 0.9em;
+    border: none;
+}
+.pretest-footer-table td {
+    border: none;
+    text-align: center;
+    font-weight: bold;
+    padding-top: 0.2rem;
+}
+</style>
+<div class="no-print mb-3 text-center">
+    <button onclick="window.print()" class="btn btn-primary">طباعة</button>
+    <a href="javascript:window.close()" class="btn btn-secondary">إغلاق</a>
+</div>
+<div class="pretest-sheet">
+    <div class="pretest-header-right">
+        الأزهر الشريف<br>
+        منطقة البحيرة الأزهرية<br>
+        إدارة التدريب
+    </div>
+    <div class="pretest-title-center">
+        كشف درجات الاختبار القبلي للمتدربين لبرنامج (<span style="font-weight:normal">{{ program.name }}</span>) لمعلمي (<span style="font-weight:normal">{{ program.target_group }}</span>) المقام في الفترة من (<span style="font-weight:normal">{{ program.start_date }}</span>) إلى (<span style="font-weight:normal">{{ program.end_date }}</span>) المقام في (<span style="font-weight:normal">{{ program.location|default:'-' }}</span>)
+    </div>
+    <table class="pretest-table">
+        <thead>
+            <tr>
+                <th style="min-width: 30px;">م</th>
+                <th style="min-width: 120px;">اسم المتدرب رباعي</th>
+                <th style="min-width: 80px;">المعهد</th>
+                <th style="min-width: 80px;">الإدارة</th>
+                <th style="min-width: 60px;">درجة / 70</th>
+                <th style="min-width: 80px;">ملاحظات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for teacher in pages.0.0 %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ teacher.name }}</td>
+                <td>{{ teacher.institute }}</td>
+                <td>{{ teacher.region }}</td>
+                <td>{{ teacher.pretest_score }}</td>
+                <td>{{ teacher.pretest_note }}</td>
+            </tr>
+            {% endfor %}
+            {% for i in pages.0.1 %}
+            <tr>
+                <td>{{ pages.0.0|length|add:forloop.counter }}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div style="width:100%; margin-top:1.5rem; display: flex; flex-direction: column; align-items: center;">
+        <div style="text-align:right; width:100%; display:flex; justify-content:right; padding-right: 90px;">المشرف التنفيذى</div>
+        <table class="pretest-footer-table" style="width:100%; margin-top:1.5rem;">
+            <tr>
+                <td style="text-align: right; font-weight: bold; min-width: 90px;">الاسم</td>
+                <td style="text-align: right; font-weight: bold; min-width: 90px; padding-right: 100px;">التوقيع</td>
+                <td style="text-align: center; font-weight: bold; min-width: 140px;">مدير إدارة التدريب</td>
+                <td style="text-align: left; font-weight: bold; min-width: 90px; padding-left: 100px;">يعتمد</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td style="text-align: center; font-weight: bold;">د . محمد فتحى قنطوش</td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% endblock %} 

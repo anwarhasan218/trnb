@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}كشف التعارف{% endblock %}
+{% block content %}
+<style>
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 0;
+    }
+    html, body {
+        width: 240mm !important;
+        height: 210mm !important;
+        min-width: 240mm !important;
+        min-height: 210mm !important;
+        max-width: 297mm !important;
+        max-height: 210mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        box-sizing: border-box;
+        overflow: visible !important;
+    }
+    body * { visibility: hidden !important; }
+    .introduction-sheet, .introduction-sheet * { visibility: visible !important; }
+    .introduction-sheet {
+        width: 280mm !important;
+        height: 210mm !important;
+        min-width: 280mm !important;
+        min-height: 210mm !important;
+        max-width: 297mm !important;
+        max-height: 210mm !important;
+        margin: 0 auto 0 0 !important;
+        margin-right:0 !important;
+        margin-left: 1.7cm !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        box-sizing: border-box;
+        background: #fff !important;
+        page-break-after: always;
+        position: static !important;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        direction: rtl !important;
+    }
+    .introduction-table, .introduction-footer-table { width: 100% !important; }
+    .introduction-table {
+        direction: rtl !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+    }
+    .introduction-table tr, .introduction-table td, .introduction-table th {
+        height: 0.6cm !important;
+        min-height: 0.6cm !important;
+        max-height: 0.6cm !important;
+        font-size: 0.7em !important;
+        padding: 0 !important;
+        line-height: 1 !important;
+    }
+    .introduction-header-right, .introduction-title-center, .introduction-footer-table, .introduction-footer-table td {
+        font-size: 0.75em !important;
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+    .introduction-footer-table td { font-size: 0.75em !important; }
+    .no-print, .navbar, .sidebar, .other-elements {
+        display: none !important;
+    }
+    body, table, th, td, div, span, p, h1, h2, h3, h4, h5, h6 {
+        font-size: 14px !important;
+        font-weight: bold !important;
+    }
+}
+.introduction-sheet {
+    background: #fff;
+    width: 29.7cm;
+    height: 20.7cm;
+    min-height: 20.7cm;
+    max-height: 20.7cm;
+    margin: 0;
+    box-sizing: border-box;
+    border: 1.5px solid #000;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+.introduction-header-right {
+    text-align: right;
+    font-weight: bold;
+    font-size: 1.02rem;
+    line-height: 1.5;
+    margin-bottom: 0.2rem;
+    margin-right: 0.5rem;
+}
+.introduction-title-center {
+    text-align: center;
+    font-size: 1.08rem;
+    font-weight: bold;
+    margin-bottom: 1.2rem;
+    margin-top: 0.2rem;
+    line-height: 1.7;
+}
+.introduction-table th, .introduction-table td {
+    border: 1px solid #222;
+    text-align: center;
+}
+.introduction-table th {
+    background: #f3f6fa;
+    font-size: 0.85em;
+}
+.introduction-table td, .introduction-table th { padding: 0 !important; }
+.introduction-footer-table {
+    width: 100%;
+    margin-top: 0.7cm;
+    font-size: 0.8em;
+    border: none;
+}
+.introduction-footer-table td {
+    border: none;
+    text-align: center;
+    font-weight: bold;
+    padding-top: 0.2rem;
+}
+</style>
+<div class="no-print mb-3 text-center">
+    <button onclick="window.print()" class="btn btn-primary">طباعة</button>
+    <a href="javascript:window.close()" class="btn btn-secondary">إغلاق</a>
+</div>
+{% for teachers, empty_rows, page_start in pages %}
+    <div class="introduction-sheet">
+        <div class="introduction-header-right">
+            الأزهر الشريف<br>
+            منطقة البحيرة الأزهرية<br>
+            إدارة التدريب
+        </div>
+        <div class="introduction-title-center">
+            كشف تعارف المتدربين لبرنامج (<span style="font-weight:normal">{{ program.name }}</span>) لمعلمي (<span style="font-weight:normal">{{ program.target_group }}</span>) المقام في الفترة من (<span style="font-weight:normal">{{ program.start_date }}</span>) إلى (<span style="font-weight:normal">{{ program.end_date }}</span>) المقام في (<span style="font-weight:normal">{{ program.location|default:'-' }}</span>)
+        </div>
+        <table class="introduction-table">
+            <thead>
+                <tr>
+                    <th style="min-width: 30px;">م</th>
+                    <th style="min-width: 60px;">السجل</th>
+                    <th style="min-width: 100px;">الاسم</th>
+                    <th style="min-width: 60px;">المنطقة</th>
+                    <th style="min-width: 100px;">الرقم القومي</th>
+                    <th style="min-width: 80px;">تاريخ الحضور</th>
+                    <th style="min-width: 60px;">المعهد</th>
+                    <th style="min-width: 60px;">الوظيفة الحالية</th>
+                    <th style="min-width: 60px;">المرحلة</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                <tr>
+                    <td>{{ forloop.counter0|add:page_start|add:1 }}</td>
+                    <td>{{ teacher.record_number }}</td>
+                    <td>{{ teacher.name }}</td>
+                    <td>{{ teacher.region }}</td>
+                    <td>{{ teacher.national_id }}</td>
+                    <td>{{ program.start_date }}</td>
+                    <td>{{ teacher.institute }}</td>
+                    <td>{{ teacher.job_grade }}</td>
+                    <td>{{ teacher.stage }}</td>
+                </tr>
+                {% endfor %}
+                {% for i in empty_rows %}
+                <tr>
+                    <td>{{ teachers|length|add:page_start|add:forloop.counter }}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="width:100%; margin-top:1.5rem; display: flex; flex-direction: column; align-items: center;">
+            <table class="introduction-footer-table" style="width:100%; margin-top:1.5rem;">
+                <tr>
+                    <td style="text-align: right; font-weight: bold; min-width: 90px;">المشرف المنفذ</td>
+                    <td style="text-align: right; font-weight: bold; min-width: 90px;">الاسم</td>
+                    <td style="text-align: center; font-weight: bold; min-width: 140px;">مدير إدارة التدريب</td>
+                    <td style="text-align: left; font-weight: bold; min-width: 90px;">يعتمد</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: center; font-weight: bold;">د . محمد فتحى قنطوش</td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    {% if not forloop.last %}
+        <div style="page-break-after: always;"></div>
+    {% endif %}
+{% endfor %}
+{% endblock %} 
